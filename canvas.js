@@ -2157,6 +2157,65 @@ if (typeof Path2D !== 'function') {
       }
     }
 
+    Path_.prototype['roundRect'] = function() {
+      var x, y, width, height;
+      var rtlh, rtlv, rtrh, rtrv, rbrh, rbrv, rblh, rblv;
+      if (arguments.length < 4) {
+        throw TypeError('Wrong number of arguments.');
+      }
+      x      = arguments[0];
+      y      = arguments[1];
+      width  = arguments[2];
+      height = arguments[3];
+      if (arguments.length == 4+1) {
+        rtlh = rtlv = rtrh = rtrv = rbrh = rbrv = rblh = rblv = arguments[4+0];
+      } else if (arguments.length == 4+2) {
+        rtlh = rtrh = rbrh = rblh = arguments[4+0];
+        rtlv = rtrv = rbrv = rblv = arguments[4+1];
+      } else if (arguments.length == 4+4) {
+       rtlv = rtlh = arguments[4+0];
+       rtrv = rtrh = arguments[4+1];
+       rbrv = rbrh = arguments[4+2];
+       rblv = rblh = arguments[4+3];
+      } else if (arguments.length == 4+8) {
+       rtlh = arguments[4+0];
+       rtlv = arguments[4+1];
+       rtrh = arguments[4+2];
+       rtrv = arguments[4+3];
+       rbrh = arguments[4+4];
+       rbrv = arguments[4+5];
+       rblh = arguments[4+6];
+       rblv = arguments[4+7];
+      } else {
+        throw TypeError('Wrong number of arguments.');
+      }
+
+      // Validate all the radii against the lengths of the rectangle, throw an
+      // exception if they exceed.
+      if (rtlh + rtrh > width || rblh + rbrh > width || rtlv + rblv > height || rtrv + rbrv > height) {
+        throw RangeError('Radii exceed bounds of the rectangle.');
+      }
+
+      // The angles for the radii at each corner.
+      var delta = Math.PI/2;
+      var start = Math.PI;
+      var end   = 3*Math.PI/2;
+      // emit all the lines and arcs here.
+      this.ops_.push({type: 'closePath', args: []});
+      this.ops_.push({type: 'moveTo', args: [x, y+rtlv]});
+      this.ops_.push({type: 'ellipse', args: [x+rtlh, y+rtlv, rtlh, rtlv, 0, start, end, false]});
+      start += delta;
+      end   += delta;
+      this.ops_.push({type: 'ellipse', args: [x+width-rtrh, y+rtrv, rtrh, rtrv, 0, start, end, false]});
+      start += delta;
+      end   += delta;
+      this.ops_.push({type: 'ellipse', args: [x+width-rbrh, y+height-rbrv, rbrh, rbrv, 0, start, end, false]});
+      start += delta;
+      end   += delta;
+      this.ops_.push({type: 'ellipse', args: [x+rblh, y+height-rblv, rblh, rblv, 0, start, end, false]});
+      this.ops_.push({type: 'closePath', args: []});
+    }
+
     original_fill = CanvasRenderingContext2D.prototype.fill;
     original_stroke = CanvasRenderingContext2D.prototype.stroke;
     original_clip = CanvasRenderingContext2D.prototype.clip;

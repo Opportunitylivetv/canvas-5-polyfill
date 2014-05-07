@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test RR</title>
+    <meta charset="utf-8" />
+    <script src="./canvas.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+   <canvas id=c width=500 height=500>
+   <script type="text/javascript" charset="utf-8">
+     var ctx = document.getElementById('c').getContext('2d');
+     ctx.strokeStyle = "#345";
+     ctx.lineWidth = 10;
+     ctx.fillStyle = "#999";
+
+     var p = new Path2D();
+     p.roundRect(10, 10, 100, 100, 10);
+     ctx.stroke(p)
+
+     p = new Path2D();
+     p.roundRect(120, 120, 100, 100, 10, 10, 10, 20, 20, 10, 40, 40);
+     ctx.fill(p)
+   </script>
+</body>
+</html>
